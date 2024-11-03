@@ -39,7 +39,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Dmitry/source/repos/DataCollector/out/build/x64-debug"
+			"value" : "c:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/out/build/x64-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -159,7 +159,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "/MDd /Ob0 /Od /RTC1"
+			"value" : "/MDd /Zi /Ob0 /Od /RTC1"
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS_MINSIZEREL",
@@ -207,7 +207,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "/MD /O2 /Ob1 /DNDEBUG"
+			"value" : "/MD /Zi /O2 /Ob1 /DNDEBUG"
 		},
 		{
 			"name" : "CMAKE_CXX_STANDARD_LIBRARIES",
@@ -271,7 +271,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "/MDd /Ob0 /Od /RTC1"
+			"value" : "/MDd /Zi /Ob0 /Od /RTC1"
 		},
 		{
 			"name" : "CMAKE_C_FLAGS_MINSIZEREL",
@@ -319,7 +319,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "/MD /O2 /Ob1 /DNDEBUG"
+			"value" : "/MD /Zi /O2 /Ob1 /DNDEBUG"
 		},
 		{
 			"name" : "CMAKE_C_STANDARD_LIBRARIES",
@@ -467,7 +467,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Dmitry/source/repos/DataCollector/out/build/x64-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/out/build/x64-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -527,7 +527,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/Dmitry/source/repos/DataCollector"
+			"value" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/Users/Dmitry/source/repos/DataCollector/out/install/x64-debug"
+			"value" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/out/install/x64-debug"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -1050,6 +1050,18 @@
 			"value" : ""
 		},
 		{
+			"name" : "CMAKE_TOOLCHAIN_FILE",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : ""
+				}
+			],
+			"type" : "STRING",
+			"value" : "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+		},
+		{
 			"name" : "CMAKE_VERBOSE_MAKEFILE",
 			"properties" : 
 			[
@@ -1075,7 +1087,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Dmitry/source/repos/DataCollector/out/build/x64-debug"
+			"value" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/out/build/x64-debug"
 		},
 		{
 			"name" : "DataCollector_IS_TOP_LEVEL",
@@ -1099,7 +1111,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Dmitry/source/repos/DataCollector"
+			"value" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector"
 		}
 	],
 	"kind" : "cache",

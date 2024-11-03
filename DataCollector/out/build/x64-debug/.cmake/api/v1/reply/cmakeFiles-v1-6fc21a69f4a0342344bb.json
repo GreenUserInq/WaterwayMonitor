@@ -144,8 +144,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "C:/Users/Dmitry/source/repos/DataCollector/out/build/x64-debug",
-		"source" : "C:/Users/Dmitry/source/repos/DataCollector"
+		"build" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/out/build/x64-debug",
+		"source" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector"
 	},
 	"version" : 
 	{

@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Models\" />
+    <Folder Include="Common\Services\" />
+    <Folder Include="WaterMonitoring\Data\" />
+  </ItemGroup>
+
 </Project>
