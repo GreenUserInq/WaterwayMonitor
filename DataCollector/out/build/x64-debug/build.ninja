@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_DataCollector: phony || .
 
 build CMakeFiles\DataCollector.dir\DataCollector.cpp.obj: CXX_COMPILER__DataCollector_unscanned_Debug C$:\Users\Dmitry\source\repos\WaterwayMonitor\DataCollector\DataCollector.cpp || cmake_object_order_depends_target_DataCollector
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
-  INCLUDES = -IC:\vcpkg\x64-windows\include
+  INCLUDES = -IC:\vcpkg\installed\x64-windows\include
   OBJECT_DIR = CMakeFiles\DataCollector.dir
   OBJECT_FILE_DIR = CMakeFiles\DataCollector.dir
   TARGET_COMPILE_PDB = CMakeFiles\DataCollector.dir\
@@ -65,11 +65,10 @@ build CMakeFiles\DataCollector.dir\DataCollector.cpp.obj: CXX_COMPILER__DataColl
 #############################################
 # Link the executable DataCollector.exe
 
-build DataCollector.exe: CXX_EXECUTABLE_LINKER__DataCollector_Debug CMakeFiles\DataCollector.dir\DataCollector.cpp.obj
+build DataCollector.exe: CXX_EXECUTABLE_LINKER__DataCollector_Debug CMakeFiles\DataCollector.dir\DataCollector.cpp.obj | C$:\vcpkg\installed\x64-windows\lib\modbus.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = modbus.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  LINK_PATH = -LIBPATH:C:\vcpkg\x64-windows\lib
+  LINK_LIBRARIES = C:\vcpkg\installed\x64-windows\lib\modbus.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\DataCollector.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

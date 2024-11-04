@@ -4,7 +4,7 @@
 #include <sstream>
 
 // Указываем полный путь к modbus.h
-#include <modbus/modbus.h>
+
 
 
 struct Data {

@@ -14,7 +14,6 @@
 		"commands" : 
 		[
 			"add_executable",
-			"target_link_directories",
 			"target_link_libraries",
 			"target_include_directories",
 			"set_property"
@@ -37,23 +36,17 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 24,
+				"line" : 22,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 27,
-				"parent" : 0
-			},
-			{
-				"command" : 3,
-				"file" : 0,
 				"line" : 21,
 				"parent" : 0
 			},
 			{
-				"command" : 4,
+				"command" : 3,
 				"file" : 0,
 				"line" : 17,
 				"parent" : 0
@@ -72,8 +65,8 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 4,
-					"path" : "C:/vcpkg/x64-windows/include"
+					"backtrace" : 3,
+					"path" : "C:/vcpkg/installed/x64-windows/include"
 				}
 			],
 			"language" : "CXX",
@@ -81,7 +74,7 @@
 			{
 				"backtraces" : 
 				[
-					5
+					4
 				],
 				"standard" : "20"
 			},
@@ -106,12 +99,7 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "-LIBPATH:C:\\vcpkg\\x64-windows\\lib",
-				"role" : "libraryPath"
-			},
-			{
-				"backtrace" : 3,
-				"fragment" : "modbus.lib",
+				"fragment" : "C:\\vcpkg\\installed\\x64-windows\\lib\\modbus.lib",
 				"role" : "libraries"
 			},
 			{
