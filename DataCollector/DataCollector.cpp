@@ -80,7 +80,7 @@ Data load_from_file(const std::string& file_path) {
 
 int main() {
     // Пример данных
-    Data data = { 1, 13, 0, 4, 71, 26, 1 };
+    Data data = { 1, 100, 100, 100, 71, 26, 1 };
 
     save_to_file(data, "../../../../MonitoringData.json");
     Data loaded_data = load_from_file("../../../../MonitoringData.json");

@@ -1,22 +1,21 @@
-﻿# Минимальная версия CMake
-cmake_minimum_required(VERSION 3.8)
+﻿# CMakeList.txt: проект CMake для DataCollector; включите исходный код и определения,
+# укажите здесь логику для конкретного проекта.
+#
+cmake_minimum_required (VERSION 3.8)
 
-# Название проекта
-project("DataCollector")
-
-# Установка пути к toolchain-файлу vcpkg
-if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+# Включение горячей перезагрузки для компиляторов MSVC, если поддерживается.
+if (POLICY CMP0141)
+  cmake_policy(SET CMP0141 NEW)
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-# Добавление исполняемого файла
-add_executable(DataCollector "DataCollector.cpp" "DataCollector.h")
+project ("DataCollector")
 
-# Установка стандарта C++
+# Добавьте источник в исполняемый файл этого проекта.
+add_executable (DataCollector "DataCollector.cpp" "DataCollector.h")
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET DataCollector PROPERTY CXX_STANDARD 20)
 endif()
 
-# Подключение путей к заголовочным файлам и библиотекам для modbus
-target_include_directories(DataCollector PRIVATE "C:/vcpkg/installed/x64-windows/include")
-target_link_libraries(DataCollector PRIVATE "C:/vcpkg/installed/x64-windows/lib/modbus.lib")
+# TODO: Добавьте тесты и целевые объекты, если это необходимо.
