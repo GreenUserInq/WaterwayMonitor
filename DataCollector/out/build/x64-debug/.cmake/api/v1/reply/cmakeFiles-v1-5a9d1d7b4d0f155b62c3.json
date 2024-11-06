@@ -797,8 +797,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "C:/Users/Dmitry/Documents/GitHub/WaterwayMonitor/DataCollector/out/build/x64-debug",
-		"source" : "C:/Users/Dmitry/Documents/GitHub/WaterwayMonitor/DataCollector"
+		"build" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/out/build/x64-debug",
+		"source" : "C:/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector"
 	},
 	"version" : 
 	{

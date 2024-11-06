@@ -35,7 +35,7 @@ class Program
 
         while (timerSettings.IsEnabled)
         {
-            var data = JsonService.LoadFromJsonFile<DataPublisher.WaterMonitoring.Models.MonitoringParameters>("../../../../MonitoringData.json");
+            var data = JsonService.LoadFromJsonFile<DataPublisher.WaterMonitoring.Models.MonitoringParameters>("../MonitoringData.json");
 
             var factory = new FactoryMessage();
             var mqttStr = factory.GetPostMessage(

@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/DataCollector.dir/DataCollector.cpp.o -o DataCollector  -lmodbus 
