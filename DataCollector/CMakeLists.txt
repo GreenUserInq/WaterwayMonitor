@@ -1,16 +1,21 @@
 ﻿cmake_minimum_required(VERSION 3.10)
+
 project(DataCollector)
 
-# Подключите библиотеку libmodbus с использованием pkg-config
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBMODBUS REQUIRED libmodbus)
+# Указываем путь к инструментам для vcpkg (если используете vcpkg)
+set(CMAKE_TOOLCHAIN_FILE /path/to/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
-# Укажите пути к заголовочным файлам и библиотекам libmodbus
-include_directories(${LIBMODBUS_INCLUDE_DIRS})
-link_directories(${LIBMODBUS_LIBRARY_DIRS})
+# Находим и подключаем библиотеку nlohmann-json
+find_package(nlohmann_json CONFIG REQUIRED)
 
-# Укажите исходные файлы проекта
+# Указываем путь к заголовочным файлам Modbus
+include_directories(/usr/include /usr/include/modbus)
+
+# Указываем путь к библиотекам Modbus
+link_directories(/usr/lib/x86_64-linux-gnu)
+
+# Указываем исходные файлы для сборки
 add_executable(DataCollector DataCollector.cpp)
 
-# Слинкуйте библиотеку libmodbus с вашим приложением
-target_link_libraries(DataCollector ${LIBMODBUS_LIBRARIES})
+# Подключаем библиотеки
+target_link_libraries(DataCollector PRIVATE nlohmann_json::nlohmann_json modbus)

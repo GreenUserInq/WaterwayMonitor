@@ -1,3 +1,3 @@
-/mnt/c/Users/Dmitry/Source/repos/WaterwayMonitor/DataCollector/CMakeFiles/DataCollector.dir
-/mnt/c/Users/Dmitry/Source/repos/WaterwayMonitor/DataCollector/CMakeFiles/edit_cache.dir
-/mnt/c/Users/Dmitry/Source/repos/WaterwayMonitor/DataCollector/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/CMakeFiles/DataCollector.dir
+/mnt/c/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Dmitry/source/repos/WaterwayMonitor/DataCollector/CMakeFiles/rebuild_cache.dir

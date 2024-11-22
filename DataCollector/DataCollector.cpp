@@ -1,210 +1,104 @@
-﻿#include <iostream>
+﻿#include <nlohmann/json.hpp>
+#include <modbus.h>
+#include <iostream>
 #include <fstream>
 #include <string>
-#include <sstream>
-#include <modbus.h>
-#include <vector> 
-#include <cerrno>
+#include <algorithm>
 
+// Используем alias для удобства
+using json = nlohmann::json;
 
-/// <summary>
-/// вспомогательная функция, которая читает данные из заданного диапазона регистров. 
-/// Она принимает контекст Modbus, начальный адрес, количество регистров и массив для хранения данных.
-/// </summary>
-/// <param name="ctx"></param>
-/// <param name="startAddress"></param>
-/// <param name="numRegisters"></param>
-/// <param name="data"></param>
-/// <returns></returns>
-bool readSensorData(modbus_t* ctx, int startAddress, int numRegisters, std::vector<uint16_t>& data) {
-    data.resize(numRegisters);
-    if (modbus_read_registers(ctx, startAddress, numRegisters, data.data()) == -1) {
-        std::cerr << "Ошибка чтения данных с датчика: " << modbus_strerror(errno) << "\n";
-        return false;
+// Функция для записи данных в файл JSON
+void writeMonitoringData(const std::string& file_path, uint16_t minLevel, uint16_t deviation) {
+    json root;
+    std::ifstream file_in(file_path);
+    if (file_in.is_open()) {
+        file_in >> root;
+        file_in.close();
     }
-    return true;
+
+    // Обновление данных
+    root["WaterLevel"] = minLevel;
+    root["HumidityInsideThePipe"] = deviation;
+
+    // Запись обновленных данных в файл
+    std::ofstream file_out(file_path);
+    if (file_out.is_open()) {
+        file_out << root.dump(4);  // Форматированный вывод с отступами
+        file_out.close();
+        std::cout << "Данные записаны в файл: " << file_path << "\n";
+    }
+    else {
+        std::cerr << "Не удалось открыть файл для записи: " << file_path << "\n";
+    }
 }
 
-/// <summary>
-/// Функция для чтения данных с одного датчика по его адресу на линии
-/// </summary>
-/// <param name="ctx"></param>
-/// <param name="slaveID"></param>
-/// <param name="startAddress"></param>
-/// <param name="numRegisters"></param>
-/// <param name="data"></param>
-/// <returns></returns>
-bool readSensorData1(modbus_t* ctx, int slaveID, int startAddress, int numRegisters, std::vector<uint16_t>& data) {
-    data.resize(numRegisters);
-    // Устанавливаем адрес устройства (slave ID)
+// Функция для чтения из регистра Modbus
+bool readRegister(modbus_t* ctx, int slaveID, int regAddress, uint16_t& value) {
     if (modbus_set_slave(ctx, slaveID) == -1) {
         std::cerr << "Ошибка установки slave ID " << slaveID << ": " << modbus_strerror(errno) << "\n";
         return false;
     }
 
-    // Чтение данных с устройства
-    if (modbus_read_registers(ctx, startAddress, numRegisters, data.data()) == -1) {
-        std::cerr << "Ошибка чтения данных с устройства " << slaveID << ": " << modbus_strerror(errno) << "\n";
+    if (modbus_read_registers(ctx, regAddress, 1, &value) == -1) {
+        std::cerr << "Ошибка чтения регистра " << regAddress << " у устройства " << slaveID << ": "
+            << modbus_strerror(errno) << "\n";
         return false;
     }
     return true;
 }
 
-struct Data {
-    int ID;
-    int WaterLevel;
-    int DegreeOfClogging;
-    int StructuralDeformations;
-    int AmbientTemperature;
-    int WaterFlowRate;
-    int HumidityInsideThePipe;
-
-    // Сериализация структуры Data в JSON
-    std::string to_json() const {
-        std::ostringstream oss;
-        oss << "{\n";
-        oss << "  \"ID\": " << ID << ",\n";
-        oss << "  \"WaterLevel\": " << WaterLevel << ",\n";
-        oss << "  \"DegreeOfClogging\": " << DegreeOfClogging << ",\n";
-        oss << "  \"StructuralDeformations\": " << StructuralDeformations << ",\n";
-        oss << "  \"AmbientTemperature\": " << AmbientTemperature << ",\n";
-        oss << "  \"WaterFlowRate\": " << WaterFlowRate << ",\n";
-        oss << "  \"HumidityInsideThePipe\": " << HumidityInsideThePipe << "\n";
-        oss << "}";
-        return oss.str();
-    }
-
-    // Десериализация из JSON строки в структуру Data
-    static Data from_json(const std::string& json_str) {
-        Data data;
-        std::istringstream iss(json_str);
-        std::string line;
-
-        while (std::getline(iss, line)) {
-            if (line.find("\"ID\"") != std::string::npos)
-                data.ID = std::stoi(line.substr(line.find(":") + 1));
-            else if (line.find("\"WaterLevel\"") != std::string::npos)
-                data.WaterLevel = std::stoi(line.substr(line.find(":") + 1));
-            else if (line.find("\"DegreeOfClogging\"") != std::string::npos)
-                data.DegreeOfClogging = std::stoi(line.substr(line.find(":") + 1));
-            else if (line.find("\"StructuralDeformations\"") != std::string::npos)
-                data.StructuralDeformations = std::stoi(line.substr(line.find(":") + 1));
-            else if (line.find("\"AmbientTemperature\"") != std::string::npos)
-                data.AmbientTemperature = std::stoi(line.substr(line.find(":") + 1));
-            else if (line.find("\"WaterFlowRate\"") != std::string::npos)
-                data.WaterFlowRate = std::stoi(line.substr(line.find(":") + 1));
-            else if (line.find("\"HumidityInsideThePipe\"") != std::string::npos)
-                data.HumidityInsideThePipe = std::stoi(line.substr(line.find(":") + 1));
-        }
-
-        return data;
-    }
-};
-
-// Пример записи в файл
-void save_to_file(const Data& data, const std::string& file_path) {
-    std::ofstream file(file_path);
-    if (file.is_open()) {
-        file << data.to_json();
-        file.close();
-    }
+// Функция для опроса первого датчика уровня
+bool pollLevelSensor1(modbus_t* ctx, int slaveID, uint16_t& level) {
+    return readRegister(ctx, slaveID, 0x0100, level);  // Чтение регистра для уровня
 }
 
-// Пример чтения из файла
-Data load_from_file(const std::string& file_path) {
-    std::ifstream file(file_path);
-    std::string json_str;
-    if (file.is_open()) {
-        std::getline(file, json_str, '\0');  // Чтение всего файла в строку
-        file.close();
-    }
-    return Data::from_json(json_str);
+// Функция для опроса второго датчика уровня
+bool pollLevelSensor2(modbus_t* ctx, int slaveID, uint16_t& level) {
+    return readRegister(ctx, slaveID, 0x0100, level);  // Чтение регистра для уровня
 }
 
+// Основная функция
 int main() {
-    // Пример данных
-    Data data = { 0, 0, 0, 0, 0, 0, 0 };
-    Data loaded_data = load_from_file("../../../../MonitoringData.json");
-    data = { 1, 0, 0, 0, 0, 0, 0 };
+    std::string file_path = "../../../../MonitoringData.json";
 
-//#pragma region
-//    // Параметры подключения для каждого датчика (IP остается одним и тем же, но порт разный)
-//    const char* ip_address = "127.0.0.1";  // IP-адрес устройства Modbus
-//    std::vector<int> ports = { 502, 503, 504, 505, 506, 507 }; // Порты для каждого датчика
-//
-//    // Адреса начальных регистров для каждого датчика
-//    std::vector<int> sensorAddresses = { 0, 10, 20, 30, 40, 50 };
-//    std::vector<uint16_t> sensorData;
-//
-//    // Перебор каждого порта для подключения к отдельному датчику
-//    for (size_t i = 0; i < ports.size(); ++i) {
-//        // Создаем контекст Modbus для подключения к конкретному порту
-//        modbus_t* ctx = modbus_new_tcp(ip_address, ports[i]);
-//        if (ctx == nullptr) {
-//            std::cerr << "Не удалось создать контекст Modbus для порта " << ports[i] << "\n";
-//            continue;
-//        }
-//
-//        // Подключаемся к устройству
-//        if (modbus_connect(ctx) == -1) {
-//            std::cerr << "Ошибка подключения к порту " << ports[i] << ": " << modbus_strerror(errno) << "\n";
-//            modbus_free(ctx);
-//            continue;
-//        }
-//
-//        std::cout << "Чтение данных с датчика, подключенного к порту " << ports[i] << "...\n";
-//
-//        // Чтение данных с датчика
-//        if (readSensorData(ctx, sensorAddresses[i], 2, sensorData)) {
-//            std::cout << "Данные с датчика на порту " << ports[i] << ": ";
-//            for (auto value : sensorData) {
-//                std::cout << value << " ";
-//            }
-//            std::cout << "\n";
-//        }
-//
-//        // Завершение работы с данным портом
-//        modbus_close(ctx);
-//        modbus_free(ctx);
-//
-//
-//    }
-//#pragma endregion
-#pragma region
-    modbus_t* ctx = modbus_new_tcp("127.0.0.1", 502);
-    if (ctx == nullptr) {
-        std::cerr << "Не удалось создать контекст Modbus\n";
+    // Настройки для Modbus
+    modbus_t* ctx1 = modbus_new_rtu("/dev/ttyS0", 9600, 'N', 8, 1); // Настройте порт
+    modbus_t* ctx2 = modbus_new_rtu("/dev/ttyS1", 9600, 'N', 8, 1); // Настройте порт
+
+    // Подключение к Modbus
+    if (modbus_connect(ctx1) == -1 || modbus_connect(ctx2) == -1) {
+        std::cerr << "Ошибка подключения к Modbus" << std::endl;
         return -1;
     }
 
-    // Подключение к Modbus-серверу
-    if (modbus_connect(ctx) == -1) {
-        std::cerr << "Ошибка подключения: " << modbus_strerror(errno) << "\n";
-        modbus_free(ctx);
+    // Чтение данных с датчиков уровня
+    uint16_t level1 = 0, level2 = 0;
+    if (pollLevelSensor1(ctx1, 1, level1) && pollLevelSensor2(ctx2, 2, level2)) {
+        // Вычисление минимального уровня и отклонения
+        uint16_t minLevel = std::min(level1, level2);
+        uint16_t maxLevel = std::max(level1, level2);
+        uint16_t deviation = maxLevel - minLevel;
+
+        // Запись данных в JSON файл
+        writeMonitoringData(file_path, minLevel, deviation);
+    }
+    else {
+        std::cerr << "Ошибка опроса датчиков уровня" << std::endl;
         return -1;
     }
 
-    // Параметры для двух датчиков
-    std::vector<int> slaveIDs = { 1, 2 };        // ID для каждого датчика на линии
-    int startAddress = 0;                      // Начальный адрес данных
-    int numRegisters = 2;                      // Количество регистров для чтения
+    // Закрытие соединений
+    modbus_close(ctx1);
+    modbus_close(ctx2);
+    modbus_free(ctx1);
+    modbus_free(ctx2);
 
-    for (int slaveID : slaveIDs) {
-        std::vector<uint16_t> sensorData;
-        if (readSensorData1(ctx, slaveID, startAddress, numRegisters, sensorData)) {
-            std::cout << "Данные с датчика ID " << slaveID << ": ";
-            for (auto value : sensorData) {
-                std::cout << value << " ";
-            }
-            std::cout << "\n";
-        }
-    }
-#pragma endregion
-
-    save_to_file(data, "../../../../MonitoringData.json");
     return 0;
 }
 
+
+//save_to_file(data, "../../../../MonitoringData.json");
 //для отображения
     // Вывод загруженных данных
     /*std::cout << "ID: " << loaded_data.ID << "\n"
