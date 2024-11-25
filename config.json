@@ -1,0 +1,23 @@
+{
+  "IntervalMs": 5000,
+  "Sensors": [
+    {
+      "SlaveID": 1,
+      "Port": "/dev/ttyS0",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0100"
+    },
+    {
+      "SlaveID": 2,
+      "Port": "/dev/ttyS1",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0100"
+    }
+  ]
+}
