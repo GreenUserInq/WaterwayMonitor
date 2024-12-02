@@ -18,6 +18,15 @@
       "DataBits": 8,
       "StopBits": 1,
       "RegisterAddress": "0x0100"
+    },
+    {
+      "SlaveID": 3,
+      "Port": "/dev/ttyS2",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0200"
     }
   ]
 }

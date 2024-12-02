@@ -5,7 +5,8 @@
 #include <string>
 #include <chrono>
 #include <thread>
-#include <sys/stat.h> // Для проверки изменения файла конфигурации
+#include <sys/stat.h>
+#include <vector>
 
 using json = nlohmann::json;
 
@@ -40,12 +41,13 @@ int readConfig(const std::string& config_path, std::vector<SensorConfig>& sensor
 
         // Загружаем конфигурацию для датчиков
         if (config_json.contains("Sensors") && config_json["Sensors"].is_array()) {
+            sensors.clear();
             for (const auto& sensor_json : config_json["Sensors"]) {
                 SensorConfig sensor;
                 sensor.slaveID = sensor_json["SlaveID"].get<int>();
                 sensor.port = sensor_json["Port"].get<std::string>();
                 sensor.baudRate = sensor_json["BaudRate"].get<int>();
-                sensor.parity = sensor_json["Parity"].get<std::string>()[0]; // Для символьного типа
+                sensor.parity = sensor_json["Parity"].get<std::string>()[0];
                 sensor.dataBits = sensor_json["DataBits"].get<int>();
                 sensor.stopBits = sensor_json["StopBits"].get<int>();
                 sensor.registerAddress = sensor_json["RegisterAddress"].get<std::string>();
@@ -77,7 +79,7 @@ bool isConfigUpdated(const std::string& config_path, time_t& last_mod_time) {
 }
 
 // Функция для записи данных в файл JSON
-void writeMonitoringData(const std::string& file_path, uint16_t deviation) {
+void writeMonitoringData(const std::string& file_path, uint16_t waterLevel, uint16_t cloggingDegree) {
     json root;
     std::ifstream file_in(file_path);
     if (file_in.is_open()) {
@@ -85,7 +87,8 @@ void writeMonitoringData(const std::string& file_path, uint16_t deviation) {
         file_in.close();
     }
 
-    root["WaterLevel"] = deviation;
+    root["WaterLevel"] = waterLevel;
+    root["DegreeOfClogging"] = cloggingDegree;
 
     std::ofstream file_out(file_path);
     if (file_out.is_open()) {
@@ -105,7 +108,7 @@ bool readRegister(modbus_t* ctx, const SensorConfig& sensor, uint16_t& value) {
         return false;
     }
 
-    int regAddress = std::stoi(sensor.registerAddress, nullptr, 16); // Преобразуем адрес из строки в число
+    int regAddress = std::stoi(sensor.registerAddress, nullptr, 16);
     if (modbus_read_registers(ctx, regAddress, 1, &value) == -1) {
         std::cerr << "Ошибка чтения регистра " << regAddress << " у устройства " << sensor.slaveID << ": "
             << modbus_strerror(errno) << "\n";
@@ -119,9 +122,9 @@ int main() {
     std::string file_path = "../MonitoringData.json";
     std::string config_path = "../config.json";
 
-    time_t last_mod_time = 0; // Время последней модификации конфигурационного файла
+    time_t last_mod_time = 0;
     std::vector<SensorConfig> sensors;
-    int interval_ms = readConfig(config_path, sensors); // Чтение интервала и конфигурации датчиков
+    int interval_ms = readConfig(config_path, sensors);
 
     std::vector<modbus_t*> contexts;
     for (const auto& sensor : sensors) {
@@ -133,7 +136,6 @@ int main() {
         contexts.push_back(ctx);
     }
 
-    // Подключение к Modbus
     for (auto& ctx : contexts) {
         if (modbus_connect(ctx) == -1) {
             std::cerr << "Ошибка подключения к Modbus\n";
@@ -142,28 +144,22 @@ int main() {
     }
 
     while (true) {
-        // Проверяем изменения в конфигурационном файле
         if (isConfigUpdated(config_path, last_mod_time)) {
             interval_ms = readConfig(config_path, sensors);
             std::cout << "Интервал обновлён: " << interval_ms << " мс\n";
         }
 
-        // Опрос датчиков
-        uint16_t level1 = 0, level2 = 0;
-        if (readRegister(contexts[0], sensors[0], level1) && readRegister(contexts[1], sensors[1], level2)) {
-            uint16_t deviation = std::abs(static_cast<int>(level1) - static_cast<int>(level2));
-
-            writeMonitoringData(file_path, deviation);
+        uint16_t waterLevel = 0, cloggingDegree = 0;
+        if (readRegister(contexts[0], sensors[0], waterLevel) && readRegister(contexts[2], sensors[2], cloggingDegree)) {
+            writeMonitoringData(file_path, waterLevel, cloggingDegree);
         }
         else {
             std::cerr << "Ошибка опроса датчиков\n";
         }
 
-        // Пауза на указанный интервал
         std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
     }
 
-    // Закрытие соединений
     for (auto& ctx : contexts) {
         modbus_close(ctx);
         modbus_free(ctx);
