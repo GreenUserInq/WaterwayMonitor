@@ -22,6 +22,8 @@ struct SensorConfig {
     int dataBits;
     int stopBits;
     std::string registerAddress;
+    std::string commandRegister; // Регистр для отправки команды
+    uint16_t commandValue;       // Значение команды
 };
 
 // Функция для чтения конфигурации
@@ -51,6 +53,10 @@ int readConfig(const std::string& config_path, std::vector<SensorConfig>& sensor
                 sensor.dataBits = sensor_json["DataBits"].get<int>();
                 sensor.stopBits = sensor_json["StopBits"].get<int>();
                 sensor.registerAddress = sensor_json["RegisterAddress"].get<std::string>();
+                if (sensor_json.contains("CommandRegister")) {
+                    sensor.commandRegister = sensor_json["CommandRegister"].get<std::string>();
+                    sensor.commandValue = sensor_json["CommandValue"].get<uint16_t>();
+                }
                 sensors.push_back(sensor);
             }
         }
@@ -76,6 +82,25 @@ bool isConfigUpdated(const std::string& config_path, time_t& last_mod_time) {
         return true;
     }
     return false;
+}
+
+// Функция для отправки команды на датчик
+bool sendCommand(modbus_t* ctx, const SensorConfig& sensor) {
+    if (modbus_set_slave(ctx, sensor.slaveID) == -1) {
+        std::cerr << "Ошибка установки slave ID " << sensor.slaveID << ": " << modbus_strerror(errno) << "\n";
+        return false;
+    }
+
+    int commandRegister = std::stoi(sensor.commandRegister, nullptr, 16);
+    if (modbus_write_register(ctx, commandRegister, sensor.commandValue) == -1) {
+        std::cerr << "Ошибка отправки команды в регистр " << commandRegister << " у устройства " << sensor.slaveID
+            << ": " << modbus_strerror(errno) << "\n";
+        return false;
+    }
+
+    // Небольшая пауза для завершения измерения
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    return true;
 }
 
 // Функция для записи данных в файл JSON
@@ -150,7 +175,9 @@ int main() {
         }
 
         uint16_t waterLevel = 0, cloggingDegree = 0;
-        if (readRegister(contexts[0], sensors[0], waterLevel) && readRegister(contexts[2], sensors[2], cloggingDegree)) {
+        if (sendCommand(contexts[0], sensors[0]) && // Отправка команды на первый датчик
+            readRegister(contexts[0], sensors[0], waterLevel) &&
+            readRegister(contexts[2], sensors[2], cloggingDegree)) {
             writeMonitoringData(file_path, waterLevel, cloggingDegree);
         }
         else {
