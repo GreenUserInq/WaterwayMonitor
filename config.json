@@ -8,7 +8,9 @@
       "Parity": "N",
       "DataBits": 8,
       "StopBits": 1,
-      "RegisterAddress": "0x0100"
+      "RegisterAddress": "0x0100",
+      "CommandRegister": "0x0200",
+      "CommandValue": 1
     },
     {
       "SlaveID": 2,
@@ -17,7 +19,9 @@
       "Parity": "N",
       "DataBits": 8,
       "StopBits": 1,
-      "RegisterAddress": "0x0100"
+      "RegisterAddress": "0x0100",
+      "CommandRegister": "0x0200",
+      "CommandValue": 1
     },
     {
       "SlaveID": 3,
@@ -27,6 +31,15 @@
       "DataBits": 8,
       "StopBits": 1,
       "RegisterAddress": "0x0200"
+    },
+    {
+      "SlaveID": 4,
+      "Port": "/dev/ttyS3",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0300"
     }
   ]
 }

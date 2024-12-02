@@ -7,6 +7,7 @@
 #include <thread>
 #include <sys/stat.h>
 #include <vector>
+#include <algorithm> // Для std::min и std::abs
 
 using json = nlohmann::json;
 
@@ -104,7 +105,7 @@ bool sendCommand(modbus_t* ctx, const SensorConfig& sensor) {
 }
 
 // Функция для записи данных в файл JSON
-void writeMonitoringData(const std::string& file_path, uint16_t waterLevel, uint16_t cloggingDegree) {
+void writeMonitoringData(const std::string& file_path, uint16_t minLevel, uint16_t cloggingDegree, uint16_t deviation) {
     json root;
     std::ifstream file_in(file_path);
     if (file_in.is_open()) {
@@ -112,8 +113,9 @@ void writeMonitoringData(const std::string& file_path, uint16_t waterLevel, uint
         file_in.close();
     }
 
-    root["WaterLevel"] = waterLevel;
+    root["WaterLevel"] = minLevel;
     root["DegreeOfClogging"] = cloggingDegree;
+    root["HumidityInsideThePipe"] = deviation;
 
     std::ofstream file_out(file_path);
     if (file_out.is_open()) {
@@ -147,7 +149,6 @@ int main() {
     std::string file_path = "/home/avads/WaterwayMonitoring/DataCollector/MonitoringData.json";
     std::string config_path = "/home/avads/WaterwayMonitoring/DataCollector/config.json";
 
-
     time_t last_mod_time = 0;
     std::vector<SensorConfig> sensors;
     int interval_ms = readConfig(config_path, sensors);
@@ -175,11 +176,16 @@ int main() {
             std::cout << "Интервал обновлён: " << interval_ms << " мс\n";
         }
 
-        uint16_t waterLevel = 0, cloggingDegree = 0;
-        if (sendCommand(contexts[0], sensors[0]) && // Отправка команды на первый датчик
-            readRegister(contexts[0], sensors[0], waterLevel) &&
+        uint16_t waterLevel1 = 0, waterLevel2 = 0, cloggingDegree = 0;
+        if (sendCommand(contexts[0], sensors[0]) &&
+            sendCommand(contexts[1], sensors[1]) &&
+            readRegister(contexts[0], sensors[0], waterLevel1) &&
+            readRegister(contexts[1], sensors[1], waterLevel2) &&
             readRegister(contexts[2], sensors[2], cloggingDegree)) {
-            writeMonitoringData(file_path, waterLevel, cloggingDegree);
+            uint16_t minLevel = std::min(waterLevel1, waterLevel2);
+            uint16_t deviation = std::abs(static_cast<int>(waterLevel1) - static_cast<int>(waterLevel2));
+
+            writeMonitoringData(file_path, minLevel, cloggingDegree, deviation);
         }
         else {
             std::cerr << "Ошибка опроса датчиков\n";
