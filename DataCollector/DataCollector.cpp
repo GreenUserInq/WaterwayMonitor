@@ -144,8 +144,9 @@ bool readRegister(modbus_t* ctx, const SensorConfig& sensor, uint16_t& value) {
 
 // Основная функция
 int main() {
-    std::string file_path = "../MonitoringData.json";
-    std::string config_path = "../config.json";
+    std::string file_path = "/home/avads/WaterwayMonitoring/DataCollector/MonitoringData.json";
+    std::string config_path = "/home/avads/WaterwayMonitoring/DataCollector/config.json";
+
 
     time_t last_mod_time = 0;
     std::vector<SensorConfig> sensors;
