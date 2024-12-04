@@ -105,7 +105,13 @@ bool sendCommand(modbus_t* ctx, const SensorConfig& sensor) {
 }
 
 // Функция для записи данных в файл JSON
-void writeMonitoringData(const std::string& file_path, uint16_t minLevel, uint16_t cloggingDegree, uint16_t deviation) {
+void writeMonitoringData(const std::string& file_path,
+    uint16_t waterLevel1, uint16_t waterLevel2,
+    uint16_t clogging1, uint16_t clogging2,
+    uint16_t header1, uint16_t header2,
+    uint16_t deformations,
+    const std::string& alarmState,
+    const std::string& errors) {
     json root;
     std::ifstream file_in(file_path);
     if (file_in.is_open()) {
@@ -113,9 +119,15 @@ void writeMonitoringData(const std::string& file_path, uint16_t minLevel, uint16
         file_in.close();
     }
 
-    root["WaterLevel"] = minLevel;
-    root["DegreeOfClogging"] = cloggingDegree;
-    root["HumidityInsideThePipe"] = deviation;
+    root["WaterLevel1"] = waterLevel1;
+    root["WaterLevel2"] = waterLevel2;
+    root["DegreeOfClogging1"] = clogging1;
+    root["DegreeOfClogging2"] = clogging2;
+    root["CloggingHeader1"] = header1;
+    root["CloggingHeader2"] = header2;
+    root["StructuralDeformations"] = deformations;
+    root["AlarmState"] = alarmState;
+    root["Errors"] = errors;
 
     std::ofstream file_out(file_path);
     if (file_out.is_open()) {
@@ -146,8 +158,8 @@ bool readRegister(modbus_t* ctx, const SensorConfig& sensor, uint16_t& value) {
 
 // Основная функция
 int main() {
-    std::string file_path = "/home/avads/WaterwayMonitoring/DataCollector/MonitoringData.json";
-    std::string config_path = "/home/avads/WaterwayMonitoring/DataCollector/config.json";
+    std::string file_path = "/home/avads/WaterwayMonitoring/MonitoringData.json";
+    std::string config_path = "/home/avads/WaterwayMonitoring/config.json";
 
     time_t last_mod_time = 0;
     std::vector<SensorConfig> sensors;
@@ -158,16 +170,14 @@ int main() {
         modbus_t* ctx = modbus_new_rtu(sensor.port.c_str(), sensor.baudRate, sensor.parity, sensor.dataBits, sensor.stopBits);
         if (!ctx) {
             std::cerr << "Ошибка создания контекста Modbus для датчика " << sensor.slaveID << "\n";
-            return -1;
+            continue;
+        }
+        if (modbus_connect(ctx) == -1) {
+            std::cerr << "Ошибка подключения к Modbus для датчика " << sensor.slaveID << "\n";
+            modbus_free(ctx);
+            continue;
         }
         contexts.push_back(ctx);
-    }
-
-    for (auto& ctx : contexts) {
-        if (modbus_connect(ctx) == -1) {
-            std::cerr << "Ошибка подключения к Modbus\n";
-            return -1;
-        }
     }
 
     while (true) {
@@ -176,20 +186,59 @@ int main() {
             std::cout << "Интервал обновлён: " << interval_ms << " мс\n";
         }
 
-        uint16_t waterLevel1 = 0, waterLevel2 = 0, cloggingDegree = 0;
-        if (sendCommand(contexts[0], sensors[0]) &&
-            sendCommand(contexts[1], sensors[1]) &&
-            readRegister(contexts[0], sensors[0], waterLevel1) &&
-            readRegister(contexts[1], sensors[1], waterLevel2) &&
-            readRegister(contexts[2], sensors[2], cloggingDegree)) {
-            uint16_t minLevel = std::min(waterLevel1, waterLevel2);
-            uint16_t deviation = std::abs(static_cast<int>(waterLevel1) - static_cast<int>(waterLevel2));
+        uint16_t waterLevel1 = 0, waterLevel2 = 0;
+        uint16_t clogging1 = 0, clogging2 = 0;
+        uint16_t header1 = 0, header2 = 0;
+        uint16_t deformations = 0;
+        std::string alarmState = "No alarms";
+        std::string errors = "";
 
-            writeMonitoringData(file_path, minLevel, cloggingDegree, deviation);
+        if (!sendCommand(contexts[0], sensors[0]) || !readRegister(contexts[0], sensors[0], waterLevel1)) {
+            errors += "WaterLevel1 - нет связи; ";
+            waterLevel1 = 0;
         }
-        else {
-            std::cerr << "Ошибка опроса датчиков\n";
+
+        if (!sendCommand(contexts[1], sensors[1]) || !readRegister(contexts[1], sensors[1], waterLevel2)) {
+            errors += "WaterLevel2 - нет связи; ";
+            waterLevel2 = 0;
         }
+
+        if (!readRegister(contexts[2], sensors[2], clogging1)) {
+            errors += "DegreeOfClogging1 - нет связи; ";
+            clogging1 = 0;
+        }
+
+        if (!readRegister(contexts[3], sensors[3], clogging2)) {
+            errors += "DegreeOfClogging2 - нет связи; ";
+            clogging2 = 0;
+        }
+
+        if (!readRegister(contexts[4], sensors[4], header1)) {
+            errors += "CloggingHeader1 - нет связи; ";
+            header1 = 0;
+        }
+
+        if (!readRegister(contexts[5], sensors[5], header2)) {
+            errors += "CloggingHeader2 - нет связи; ";
+            header2 = 0;
+        }
+
+        if (!readRegister(contexts[6], sensors[6], deformations)) {
+            errors += "StructuralDeformations - нет связи; ";
+            deformations = 0;
+        }
+
+        if (errors.empty()) {
+            errors = "No errors detected";
+        }
+
+        writeMonitoringData(file_path,
+            waterLevel1, waterLevel2,
+            clogging1, clogging2,
+            header1, header2,
+            deformations,
+            alarmState,
+            errors);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
     }
@@ -201,6 +250,7 @@ int main() {
 
     return 0;
 }
+
 
 
 

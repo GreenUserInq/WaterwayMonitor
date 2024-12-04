@@ -1,9 +1,12 @@
 {
   "ID": 1,
-  "WaterLevel": 100,
-  "DegreeOfClogging": 100,
-  "StructuralDeformations": 100,
-  "AmbientTemperature": 71,
-  "WaterFlowRate": 26,
-  "HumidityInsideThePipe": 1
+  "WaterLevel1": 100,
+  "WaterLevel2": 90,
+  "DegreeOfClogging1": 100,
+  "DegreeOfClogging2": 95,
+  "CloggingHeader1": 80,
+  "CloggingHeader2": 85,
+  "StructuralDeformations": 0,
+  "AlarmState": "No alarms",
+  "Errors": "No errors detected"
 }
