@@ -12,27 +12,43 @@ namespace DataPublisher.WaterMonitoring.Factories
     {
         public string GetPostMessage(
             int Id,
-            int Water_level,
-            int Degree_of_clogging,
-            int Structural_deformations,
-            int Ambient_temperature,
-            int Water_flow_rate,
-            int Humidity_inside_the_pipe)
+            int water_level1,
+            int water_Level2,
+            int degreeOfClogging1,
+            int degreeOfClogging2,
+            int cloggingHeader1,
+            int cloggingHeader2,
+            int structuralDeformation,
+            string alarmState,
+            string errors)
         {
             var builder = new StringBuilder();
             builder.Append($"{{\"id\":{Id}");
-            builder.Append(appenedMessage(MonitoringParameters.Water_level, Water_level));
-            builder.Append(appenedMessage(MonitoringParameters.Degree_of_clogging, Degree_of_clogging));
-            builder.Append(appenedMessage(MonitoringParameters.Structural_deformations, Structural_deformations));
-            builder.Append(appenedMessage(MonitoringParameters.Ambient_temperature, Ambient_temperature));
-            builder.Append(appenedMessage(MonitoringParameters.Water_flow_rate, Water_flow_rate));
-            builder.Append(appenedMessage(MonitoringParameters.Humidity_inside_the_pipe, Humidity_inside_the_pipe));
+            builder.Append(appenedMessageInt(MonitoringParameters.WaterLevel1, water_level1));
+            builder.Append(appenedMessageInt(MonitoringParameters.WaterLevel2, water_Level2));
+            builder.Append(appenedMessageInt(MonitoringParameters.DegreeOfClogging1, degreeOfClogging1));
+            builder.Append(appenedMessageInt(MonitoringParameters.DegreeOfClogging2, degreeOfClogging2));
+            builder.Append(appenedMessageInt(MonitoringParameters.CloggingHeader1, cloggingHeader2));
+            builder.Append(appenedMessageInt(MonitoringParameters.CloggingHeader2, cloggingHeader2));
+            builder.Append(appenedMessageInt(MonitoringParameters.StructuralDeformations, structuralDeformation));
+            builder.Append(appenedMessageBool(MonitoringParameters.AlarmState, alarmState != "No alarms"));
+            builder.Append(appenedMessageStr(MonitoringParameters.Errors, errors));
+            Console.WriteLine(errors);  
             builder.Append('}');
 
             return builder.ToString();
         }
 
-        private string appenedMessage(MonitoringParameters parameter, int value)
+        private string appenedMessageInt(MonitoringParameters parameter, int value)
+        {
+            return $",\"name\":\"{parameter.ToString()}\",\"value\":{value}";
+        }
+
+        private string appenedMessageStr(MonitoringParameters parameter, string value)
+        {
+            return $",\"name\":\"{parameter.ToString()}\",\"value\":\"{value}\"";
+        }
+        private string appenedMessageBool(MonitoringParameters parameter, bool value)
         {
             return $",\"name\":\"{parameter.ToString()}\",\"value\":{value}";
         }

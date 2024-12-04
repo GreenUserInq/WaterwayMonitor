@@ -35,17 +35,20 @@ class Program
 
         while (timerSettings.IsEnabled)
         {
-            var data = JsonService.LoadFromJsonFile<DataPublisher.WaterMonitoring.Models.MonitoringParameters>("../MonitoringData.json");
+            var data = JsonService.LoadFromJsonFile<DataPublisher.WaterMonitoring.Models.MonitoringParameters>("../../../../MonitoringData.json");
 
             var factory = new FactoryMessage();
             var mqttStr = factory.GetPostMessage(
                 data.ID,
-                data.WaterLevel,
-                data.DegreeOfClogging,
+                data.WaterLevel1,
+                data.WaterLevel2,
+                data.DegreeOfClogging1,
+                data.DegreeOfClogging2,
+                data.CloggingHeader1,
+                data.CloggingHeader2,
                 data.StructuralDeformations,
-                data.AmbientTemperature,
-                data.WaterFlowRate,
-                data.HumidityInsideThePipe);
+                data.AlarmState,
+                data.Errors);
 
             await mqttClient.PublishDataAsync(mqttStr);
 

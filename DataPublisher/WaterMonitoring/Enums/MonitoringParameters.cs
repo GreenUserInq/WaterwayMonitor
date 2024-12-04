@@ -2,12 +2,14 @@
 {
     enum MonitoringParameters
     {
-        Water_level,
-        Degree_of_clogging,
-        Structural_deformations,
-        Ambient_temperature,
-        Pressure_of_transported_liquid,
-        Water_flow_rate,
-        Humidity_inside_the_pipe,
+        WaterLevel1,
+        WaterLevel2,
+        DegreeOfClogging1,
+        DegreeOfClogging2,
+        CloggingHeader1,
+        CloggingHeader2,
+        StructuralDeformations,
+        AlarmState,
+        Errors
     }
 }

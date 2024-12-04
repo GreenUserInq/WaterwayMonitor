@@ -10,11 +10,14 @@ namespace DataPublisher.WaterMonitoring.Interfsces
     {
         string GetPostMessage(
             int ID,
-            int Water_level,
-            int Degree_of_clogging,
-            int Structural_deformations,
-            int Ambient_temperature,
-            int Water_flow_rate,
-            int Humidity_inside_the_pipe);
+            int waterlevel1,
+            int waterlevel2,
+            int DegreeOfClogging1,
+            int DegreeOfClogging2,
+            int CloggingHeader1,
+            int CloggingHeader2,
+            int StructuralDeformations,
+            string AlarmState,
+            string Errors);
     }
 }
