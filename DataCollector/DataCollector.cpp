@@ -193,45 +193,54 @@ int main() {
         std::string alarmState = "No alarms";
         std::string errors = "";
 
-        if (!sendCommand(contexts[0], sensors[0]) || !readRegister(contexts[0], sensors[0], waterLevel1)) {
+        // Считывание данных с первого датчика уровня
+        if (!readRegister(contexts[0], sensors[0], waterLevel1)) {
             errors += "WaterLevel1 - нет связи; ";
             waterLevel1 = 0;
         }
 
-        if (!sendCommand(contexts[1], sensors[1]) || !readRegister(contexts[1], sensors[1], waterLevel2)) {
+        // Считывание данных со второго датчика уровня
+        if (!readRegister(contexts[1], sensors[1], waterLevel2)) {
             errors += "WaterLevel2 - нет связи; ";
             waterLevel2 = 0;
         }
 
+        // Считывание данных с первого датчика засоренности
         if (!readRegister(contexts[2], sensors[2], clogging1)) {
             errors += "DegreeOfClogging1 - нет связи; ";
             clogging1 = 0;
         }
 
+        // Считывание данных со второго датчика засоренности
         if (!readRegister(contexts[3], sensors[3], clogging2)) {
             errors += "DegreeOfClogging2 - нет связи; ";
             clogging2 = 0;
         }
 
-        if (!readRegister(contexts[4], sensors[4], header1)) {
+        // Считывание данных с первого датчика засоренности оголовков
+        if (!sendCommand(contexts[4], sensors[4]) || !readRegister(contexts[4], sensors[4], header1)) {
             errors += "CloggingHeader1 - нет связи; ";
             header1 = 0;
         }
 
-        if (!readRegister(contexts[5], sensors[5], header2)) {
+        // Считывание данных со второго датчика засоренности оголовков
+        if (!sendCommand(contexts[5], sensors[5]) || !readRegister(contexts[5], sensors[5], header2)) {
             errors += "CloggingHeader2 - нет связи; ";
             header2 = 0;
         }
 
+        // Считывание данных с датчика деформации
         if (!readRegister(contexts[6], sensors[6], deformations)) {
             errors += "StructuralDeformations - нет связи; ";
             deformations = 0;
         }
 
+        // Если ошибок нет, записываем "No errors detected"
         if (errors.empty()) {
             errors = "No errors detected";
         }
 
+        // Запись данных в файл
         writeMonitoringData(file_path,
             waterLevel1, waterLevel2,
             clogging1, clogging2,
@@ -240,8 +249,10 @@ int main() {
             alarmState,
             errors);
 
+        // Задержка перед следующим циклом
         std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
     }
+
 
     for (auto& ctx : contexts) {
         modbus_close(ctx);
