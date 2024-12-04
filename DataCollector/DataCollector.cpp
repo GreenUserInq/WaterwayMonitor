@@ -140,6 +140,7 @@ void writeMonitoringData(const std::string& file_path,
     }
 }
 
+
 // Функция для чтения из регистра Modbus
 bool readRegister(modbus_t* ctx, const SensorConfig& sensor, uint16_t& value) {
     if (modbus_set_slave(ctx, sensor.slaveID) == -1) {
@@ -158,8 +159,8 @@ bool readRegister(modbus_t* ctx, const SensorConfig& sensor, uint16_t& value) {
 
 // Основная функция
 int main() {
-    std::string file_path = "/home/avads/WaterwayMonitoring/MonitoringData.json";
-    std::string config_path = "/home/avads/WaterwayMonitoring/config.json";
+    std::string file_path = "/home/avads/WaterwayMonitor/MonitoringData.json";
+    std::string config_path = "/home/avads/WaterwayMonitor/config.json";
 
     time_t last_mod_time = 0;
     std::vector<SensorConfig> sensors;
@@ -190,17 +191,18 @@ int main() {
         uint16_t clogging1 = 0, clogging2 = 0;
         uint16_t header1 = 0, header2 = 0;
         uint16_t deformations = 0;
+        uint16_t alarmStateRaw = 0;
         std::string alarmState = "No alarms";
         std::string errors = "";
 
         // Считывание данных с первого датчика уровня
-        if (!readRegister(contexts[0], sensors[0], waterLevel1)) {
+        if (!sendCommand(contexts[0], sensors[0]) || !readRegister(contexts[0], sensors[0], waterLevel1)) {
             errors += "WaterLevel1 - нет связи; ";
             waterLevel1 = 0;
         }
 
         // Считывание данных со второго датчика уровня
-        if (!readRegister(contexts[1], sensors[1], waterLevel2)) {
+        if (!sendCommand(contexts[1], sensors[1]) || !readRegister(contexts[1], sensors[1], waterLevel2)) {
             errors += "WaterLevel2 - нет связи; ";
             waterLevel2 = 0;
         }
@@ -235,6 +237,15 @@ int main() {
             deformations = 0;
         }
 
+        // Считывание состояния датчика тревоги
+        if (!readRegister(contexts[7], sensors[7], alarmStateRaw)) {
+            errors += "Alarm - нет связи; ";
+            alarmState = "Error: No connection";
+        }
+        else {
+            alarmState = (alarmStateRaw == 1) ? "Alarm triggered" : "No alarms";
+        }
+
         // Если ошибок нет, записываем "No errors detected"
         if (errors.empty()) {
             errors = "No errors detected";
@@ -252,6 +263,7 @@ int main() {
         // Задержка перед следующим циклом
         std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
     }
+
 
 
     for (auto& ctx : contexts) {

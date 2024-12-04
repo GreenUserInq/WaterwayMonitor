@@ -1,45 +1,94 @@
 {
-  "IntervalMs": 5000,
+  "IntervalMs": 5000, // Интервал опроса датчиков в миллисекундах
+
   "Sensors": [
     {
+      "Name": "WaterLevel1", // Первый датчик уровня воды
       "SlaveID": 1,
       "Port": "/dev/ttyS0",
       "BaudRate": 9600,
       "Parity": "N",
       "DataBits": 8,
       "StopBits": 1,
-      "RegisterAddress": "0x0100",
-      "CommandRegister": "0x0200",
-      "CommandValue": 1
+      "RegisterAddress": "0x0100", // Адрес регистра для чтения уровня воды
+      "CommandRegister": "0x0001", // Адрес регистра для команды инициализации
+      "CommandValue": 1 // Значение команды для инициализации
     },
     {
+      "Name": "WaterLevel2", // Второй датчик уровня воды
       "SlaveID": 2,
       "Port": "/dev/ttyS1",
       "BaudRate": 9600,
       "Parity": "N",
       "DataBits": 8,
       "StopBits": 1,
-      "RegisterAddress": "0x0100",
-      "CommandRegister": "0x0200",
-      "CommandValue": 1
+      "RegisterAddress": "0x0100", // Адрес регистра для чтения уровня воды
+      "CommandRegister": "0x0001", // Адрес регистра для команды инициализации
+      "CommandValue": 1 // Значение команды для инициализации
     },
     {
+      "Name": "DegreeOfClogging1", // Первый датчик засоренности
       "SlaveID": 3,
       "Port": "/dev/ttyS2",
       "BaudRate": 9600,
       "Parity": "N",
       "DataBits": 8,
       "StopBits": 1,
-      "RegisterAddress": "0x0200"
+      "RegisterAddress": "0x0200" // Адрес регистра для чтения данных засоренности
     },
     {
+      "Name": "DegreeOfClogging2", // Второй датчик засоренности
       "SlaveID": 4,
       "Port": "/dev/ttyS3",
       "BaudRate": 9600,
       "Parity": "N",
       "DataBits": 8,
       "StopBits": 1,
-      "RegisterAddress": "0x0300"
+      "RegisterAddress": "0x0200" // Адрес регистра для чтения данных засоренности
+    },
+    {
+      "Name": "CloggingHeader1", // Первый датчик засоренности оголовков
+      "SlaveID": 5,
+      "Port": "/dev/ttyS4",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0300", // Адрес регистра для чтения данных засоренности оголовков
+      "CommandRegister": "0x0002", // Адрес регистра для команды инициализации
+      "CommandValue": 2 // Значение команды для инициализации
+    },
+    {
+      "Name": "CloggingHeader2", // Второй датчик засоренности оголовков
+      "SlaveID": 6,
+      "Port": "/dev/ttyS5",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0300", // Адрес регистра для чтения данных засоренности оголовков
+      "CommandRegister": "0x0002", // Адрес регистра для команды инициализации
+      "CommandValue": 2 // Значение команды для инициализации
+    },
+    {
+      "Name": "StructuralDeformations", // Датчик деформации
+      "SlaveID": 7,
+      "Port": "/dev/ttyS6",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0400" // Адрес регистра для чтения данных о деформации
+    },
+    {
+      "Name": "Alarm", // Датчик тревоги
+      "SlaveID": 8,
+      "Port": "/dev/ttyS7",
+      "BaudRate": 9600,
+      "Parity": "N",
+      "DataBits": 8,
+      "StopBits": 1,
+      "RegisterAddress": "0x0500" // Адрес регистра для чтения состояния тревоги
     }
   ]
 }
