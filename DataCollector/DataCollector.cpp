@@ -158,7 +158,7 @@ int main() {
 
         // Работа с WaterLevel1
         try {
-            if (!readRegister(contexts[0], sensors[0], waterLevel1)) {
+            if (!readRegister(contexts[3], sensors[3], waterLevel1)) {
                 throw std::runtime_error("Ошибка чтения данных с WaterLevel1");
             }
         }
@@ -194,7 +194,7 @@ int main() {
 
         // Работа с DegreeOfClogging2
         try {
-            if (!readRegister(contexts[3], sensors[3], degreeClogging2)) {
+            if (!readRegister(contexts[0], sensors[0], degreeClogging2)) {
                 throw std::runtime_error("Ошибка чтения данных с DegreeOfClogging2");
             }
         }
