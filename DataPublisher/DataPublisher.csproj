@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="WaterMonitoring\Data\" />
+    <Compile Remove="WaterMonitoring\Data\**" />
+    <EmbeddedResource Remove="WaterMonitoring\Data\**" />
+    <None Remove="WaterMonitoring\Data\**" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,14 +1,5 @@
 {
   "ID": 1,
-<<<<<<< Updated upstream
-  "WaterLevel": 100,
-  "DegreeOfClogging": 100,
-  "StructuralDeformations": 100,
-  "AmbientTemperature": 71,
-  "WaterFlowRate": 26,
-  "HumidityInsideThePipe": 1
-}
-=======
   "WaterLevel1": 0,
   "WaterLevel2": 1,
   "DegreeOfClogging1": 1920,
@@ -19,4 +10,3 @@
   "AlarmState": "No alarms",
   "Errors": "No errors detected"
 }
->>>>>>> Stashed changes

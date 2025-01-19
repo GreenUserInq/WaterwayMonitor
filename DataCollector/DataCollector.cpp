@@ -158,7 +158,7 @@ int main() {
 
         // Работа с WaterLevel1
         try {
-            if (!readRegister(contexts[3], sensors[3], waterLevel1)) {
+            if (!readRegister(contexts[0], sensors[0], waterLevel1)) {
                 throw std::runtime_error("Ошибка чтения данных с WaterLevel1");
             }
         }
@@ -194,7 +194,7 @@ int main() {
 
         // Работа с DegreeOfClogging2
         try {
-            if (!readRegister(contexts[0], sensors[0], degreeClogging2)) {
+            if (!readRegister(contexts[3], sensors[3], degreeClogging2)) {
                 throw std::runtime_error("Ошибка чтения данных с DegreeOfClogging2");
             }
         }
@@ -230,12 +230,15 @@ int main() {
 
         // Работа с датчиком деформации
         try {
-            throw std::runtime_error("StructuralDeformations - not connected");
+            // Вызов метода Read из библиотеки AutographAPI
+            if (!AutographAPI::Read(contexts[7], sensors[7], deformations)) {
+                throw std::runtime_error("StructuralDeformations - Read failed");
+            }
         }
         catch (const std::exception& e) {
             std::cerr << e.what() << "\n";
             errors += "StructuralDeformations - not connected; ";
-            deformations = 0;
+            deformations = 0; // Значение по умолчанию
         }
 
         // Работа с AlarmSensor
